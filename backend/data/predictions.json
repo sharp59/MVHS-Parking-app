@@ -3,20 +3,56 @@
     {
       "id": "A1",
       "occupied": true,
-      "confidence": 0.9757483601570129,
-      "p_empty": 0.024251634255051613
+      "confidence": 0.9996567964553833,
+      "p_empty": 0.0003432293306104839
     },
     {
       "id": "A2",
       "occupied": true,
-      "confidence": 0.9540019631385803,
-      "p_empty": 0.045998089015483856
+      "confidence": 0.9992678761482239,
+      "p_empty": 0.0007320918957702816
     },
     {
       "id": "A3",
       "occupied": true,
-      "confidence": 0.8825322985649109,
-      "p_empty": 0.1174677237868309
+      "confidence": 0.9985435009002686,
+      "p_empty": 0.0014565561432391405
+    },
+    {
+      "id": "A4",
+      "occupied": true,
+      "confidence": 0.6753901839256287,
+      "p_empty": 0.3246098756790161
+    },
+    {
+      "id": "A5",
+      "occupied": true,
+      "confidence": 0.777102530002594,
+      "p_empty": 0.2228974550962448
+    },
+    {
+      "id": "A6",
+      "occupied": true,
+      "confidence": 0.721958577632904,
+      "p_empty": 0.27804142236709595
+    },
+    {
+      "id": "A7",
+      "occupied": false,
+      "confidence": 0.48928582668304443,
+      "p_empty": 0.5107141733169556
+    },
+    {
+      "id": "A8",
+      "occupied": true,
+      "confidence": 0.7903399467468262,
+      "p_empty": 0.20966002345085144
+    },
+    {
+      "id": "A9",
+      "occupied": true,
+      "confidence": 0.8774855136871338,
+      "p_empty": 0.12251449376344681
     }
   ]
 }

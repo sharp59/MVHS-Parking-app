@@ -17,9 +17,6 @@ def find_first_model(repo_root: Path):
     prototxts = list(base.rglob("*.prototxt"))
     caffes = list(base.rglob("*.caffemodel"))
 
-    print("Searching models in:", base)
-    print("Found prototxts:", len(prototxts))
-    print("Found caffemodels:", len(caffes))
 
     if not prototxts or not caffes:
         raise FileNotFoundError(
@@ -39,8 +36,6 @@ def main():
 
     # ---- load model ----
     prototxt, model = find_first_model(repo_root)
-    print("Using prototxt:", prototxt)
-    print("Using caffemodel:", model)
 
     net = cv2.dnn.readNetFromCaffe(str(prototxt), str(model))
 
@@ -77,7 +72,6 @@ def main():
         patch_debug_path = backend_root / "data" / "patch_debug.jpg"
         cv2.imwrite(str(patch_debug_path), patch)
         md5 = hashlib.md5(patch.tobytes()).hexdigest()
-        print(f"{sid} patch shape={patch.shape} mean={float(patch.mean()):.4f} md5={md5}")
 
         blob = cv2.dnn.blobFromImage(
             patch,
