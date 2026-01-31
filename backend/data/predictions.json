@@ -1,0 +1,22 @@
+{
+  "spots": [
+    {
+      "id": "A1",
+      "occupied": true,
+      "confidence": 0.9757483601570129,
+      "p_empty": 0.024251634255051613
+    },
+    {
+      "id": "A2",
+      "occupied": true,
+      "confidence": 0.9540019631385803,
+      "p_empty": 0.045998089015483856
+    },
+    {
+      "id": "A3",
+      "occupied": true,
+      "confidence": 0.8825322985649109,
+      "p_empty": 0.1174677237868309
+    }
+  ]
+}
