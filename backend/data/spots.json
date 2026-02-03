@@ -1,13 +1,22 @@
 {
   "spots": [
-    { "id": "A1", "rect": [158, 699, 132, 58] },
-    { "id": "A2", "rect": [294, 697, 135, 57] },
-    { "id": "A3", "rect": [432, 685, 138, 70] },
-    { "id": "A4", "rect": [576, 668, 131, 73] },
-    { "id": "A5", "rect": [712, 666, 143, 75] },
-    { "id": "A6", "rect": [841, 667, 151, 73] },
-    { "id": "A7", "rect": [985, 660, 139, 64] },
-    { "id": "A8", "rect": [1114, 661, 129, 53] },
-    { "id": "A9", "rect": [1222, 647, 145, 51] }
+    { "id": "A1", "rect": [21, 721, 130, 45], "occupied": false },
+    { "id": "A2", "rect": [164, 717, 127, 47], "occupied": true },
+    { "id": "A3", "rect": [300, 715, 131, 46], "occupied": true },
+    { "id": "A4", "rect": [441, 709, 130, 45], "occupied": true },
+    { "id": "A5", "rect": [575, 703, 136, 45], "occupied": false },
+    { "id": "A6", "rect": [712, 692, 128, 51], "occupied": true },
+    { "id": "A7", "rect": [837, 689, 141, 46], "occupied": false },
+    { "id": "A8", "rect": [982, 683, 144, 51], "occupied": true },
+    { "id": "A9", "rect": [1117, 677, 129, 43], "occupied": false },
+    { "id": "A10", "rect": [1240, 671, 153, 39], "occupied": false },
+    { "id": "B1", "rect": [35, 908, 186, 73], "occupied": true },
+    { "id": "B2", "rect": [234, 904, 201, 83], "occupied": true },
+    { "id": "B3", "rect": [438, 897, 201, 80], "occupied": true },
+    { "id": "B4", "rect": [641, 893, 211, 83], "occupied": true },
+    { "id": "B5", "rect": [851, 881, 201, 93], "occupied": false },
+    { "id": "B6", "rect": [1055, 869, 183, 99], "occupied": false },
+    { "id": "B7", "rect": [1233, 859, 237, 91], "occupied": true },
+    { "id": "B8", "rect": [1467, 844, 182, 106], "occupied": true }
   ]
 }
