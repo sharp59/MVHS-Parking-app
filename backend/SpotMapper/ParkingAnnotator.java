@@ -20,7 +20,7 @@ import javax.swing.*;
  */
 public class ParkingAnnotator extends JPanel {
 
-    // ✅ Set these paths once
+    
     private static final String IMAGE_PATH = "frame.jpg";
     private static final String SPOTS_JSON_PATH = "backend/data/spots.json";
 
