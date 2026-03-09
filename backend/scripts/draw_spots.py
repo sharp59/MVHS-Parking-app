@@ -33,15 +33,16 @@ def main():
         spots = json.load(f)["spots"]
 
     for s in spots:
-        x, y, w, h = s["rect"]
         sid = s["id"]
 
-        cv2.rectangle(
+        pts = np.array(s["polygon"],np.int32)
+
+        cv2.polylines(
             img,
-            (x, y),
-            (x + w, y + h),
-            (0, 255, 0),
-            2,
+            [pts],
+            True,
+            (0,255,0),
+            2
         )
 
         cv2.putText(

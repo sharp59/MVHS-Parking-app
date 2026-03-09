@@ -8,8 +8,8 @@
     { "id": "A6", "rect": [712, 692, 128, 51], "occupied": true },
     { "id": "A7", "rect": [837, 689, 141, 46], "occupied": false },
     { "id": "A8", "rect": [982, 683, 144, 51], "occupied": true },
-    { "id": "A9", "rect": [1117, 677, 129, 43], "occupied": false },
-    { "id": "A10", "rect": [1240, 671, 153, 39], "occupied": false },
+    { "id": "A9", "rect": [1117, 677, 128, 41], "occupied": false },
+    { "id": "A10", "rect": [1225, 675, 135, 38], "occupied": false },
     { "id": "B1", "rect": [35, 908, 186, 73], "occupied": true },
     { "id": "B2", "rect": [234, 904, 201, 83], "occupied": true },
     { "id": "B3", "rect": [438, 897, 201, 80], "occupied": true },
@@ -17,6 +17,8 @@
     { "id": "B5", "rect": [851, 881, 201, 93], "occupied": false },
     { "id": "B6", "rect": [1055, 869, 183, 99], "occupied": false },
     { "id": "B7", "rect": [1233, 859, 237, 91], "occupied": true },
-    { "id": "B8", "rect": [1467, 844, 182, 106], "occupied": true }
+    { "id": "B8", "rect": [1467, 844, 182, 106], "occupied": true },
+    { "id": "A11", "rect": [1339, 668, 153, 44], "occupied": false },
+    { "id": "A12", "rect": [1453, 662, 161, 32], "occupied": true }
   ]
 }

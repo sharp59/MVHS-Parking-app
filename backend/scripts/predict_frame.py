@@ -4,6 +4,19 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+# ==========================================================
+# BACKGROUND SUBTRACTION (OPTIONAL FUTURE FEATURE)
+# ----------------------------------------------------------
+# When you capture an empty parking lot image, enable this:
+#
+# background = cv2.imread("background.jpg")
+#
+# Then later replace the crop line with:
+#
+# crop = diff[y:y+h, x:x+w].copy()
+#
+# ==========================================================
+
 
 def find_first_model(repo_root: Path):
     """
@@ -12,7 +25,9 @@ def find_first_model(repo_root: Path):
       repo_root/backend/models/method4/**.caffemodel
     Returns (prototxt_path, caffemodel_path)
     """
+
     base = repo_root / "backend" / "models" / "method4"
+
     prototxts = list(base.rglob("*.prototxt"))
     caffes = list(base.rglob("*.caffemodel"))
 
@@ -21,30 +36,48 @@ def find_first_model(repo_root: Path):
             f"Could not find .prototxt/.caffemodel under {base}. Check your folder location."
         )
 
-    # Pick the first pair found (fine for now).
     return prototxts[0], caffes[0]
 
 
 def main():
-    repo_root = Path(__file__).resolve().parents[2]   # .../MVHS-Parking-app
-    backend_root = Path(__file__).resolve().parents[1]  # .../MVHS-Parking-app/backend
 
-    # ---- load model ----
+    repo_root = Path(__file__).resolve().parents[2]
+    backend_root = Path(__file__).resolve().parents[1]
+
+    # -----------------------------
+    # LOAD MODEL
+    # -----------------------------
+
     prototxt, model = find_first_model(repo_root)
+
     net = cv2.dnn.readNetFromCaffe(str(prototxt), str(model))
 
-    # ---- load data ----
+    # -----------------------------
+    # LOAD DATA
+    # -----------------------------
+
     img_path = backend_root / "data" / "frame.jpg"
     spots_path = backend_root / "data" / "spots.json"
 
     img = cv2.imread(str(img_path))
+
     if img is None:
         raise FileNotFoundError(f"Could not read image: {img_path}")
+
+    # ==========================================================
+    # BACKGROUND SUBTRACTION (ENABLE LATER)
+    #
+    # diff = cv2.absdiff(img, background)
+    #
+    # ==========================================================
 
     with open(spots_path, "r") as f:
         spots = json.load(f)["spots"]
 
-    # ---- inference settings (the ones that worked for you) ----
+    # -----------------------------
+    # INFERENCE SETTINGS
+    # -----------------------------
+
     INPUT_W, INPUT_H = 224, 224
     SCALE = 1 / 255.0
     MEAN = (0, 0, 0)
@@ -56,17 +89,45 @@ def main():
     correct = 0
     total = 0
 
+    # -----------------------------
+    # PROCESS EACH PARKING SPOT
+    # -----------------------------
+
     for s in spots:
+
         sid = s["id"]
-        x, y, w, h = s["rect"]
 
-        # "real value" from spots.json (defaults to False if missing)
-        real_occupied = bool(s.get("occupied", False))
+        pts = np.array(s["polygon"], np.int32)
 
-        patch = img[y : y + h, x : x + w]
+        x, y, w, h = cv2.boundingRect(pts)
+
+        # ------------------------------------------------------
+        # NORMAL CROPPING (CURRENT BEHAVIOR)
+        # ------------------------------------------------------
+
+        crop = img[y:y+h, x:x+w].copy()
+
+        # ------------------------------------------------------
+        # BACKGROUND SUBTRACTION VERSION (ENABLE LATER)
+        #
+        # crop = diff[y:y+h, x:x+w].copy()
+        #
+        # ------------------------------------------------------
+
+        mask = np.zeros((h, w), dtype=np.uint8)
+
+        pts_shifted = pts - [x, y]
+
+        cv2.fillPoly(mask, [pts_shifted], 255)
+
+        patch = cv2.bitwise_and(crop, crop, mask=mask)
+
         if patch.size == 0:
-            print(f"{sid}: [?, ?], ?, real={real_occupied}, correct?=False  (EMPTY PATCH out of bounds)")
+            print(f"{sid}: EMPTY PATCH (out of bounds)")
             continue
+
+        # Resize to CNN input
+        patch = cv2.resize(patch, (INPUT_W, INPUT_H))
 
         blob = cv2.dnn.blobFromImage(
             patch,
@@ -78,15 +139,19 @@ def main():
         )
 
         net.setInput(blob)
+
         out = net.forward().flatten()
 
         if out.size != 2:
-            raise RuntimeError(f"Expected 2 outputs, got shape {out.shape} for {sid}: {out}")
+            raise RuntimeError(f"Expected 2 outputs, got {out.shape} for {sid}: {out}")
 
-        p_unocc = float(out[0])  # unoccupied/empty confidence
-        p_occ = float(out[1])    # occupied confidence
+        p_unocc = float(out[0])
+        p_occ = float(out[1])
 
         pred_occupied = p_occ > 0.5
+
+        real_occupied = bool(s.get("occupied", False))
+
         is_correct = (pred_occupied == real_occupied)
 
         total += 1
@@ -112,13 +177,29 @@ def main():
             }
         )
 
-    # Summary line
-    print(f"\n{correct}/{total}")
+    # -----------------------------
+    # SUMMARY
+    # -----------------------------
 
-    # Optional: write results for later use
+    print(f"\nAccuracy: {correct}/{total}")
+
+    # -----------------------------
+    # SAVE RESULTS
+    # -----------------------------
+
     out_path = backend_root / "data" / "predictions.json"
+
     with open(out_path, "w") as f:
-        json.dump({"spots": results, "correct": correct, "total": total}, f, indent=2)
+        json.dump(
+            {
+                "spots": results,
+                "correct": correct,
+                "total": total,
+            },
+            f,
+            indent=2,
+        )
+
     print("Wrote:", out_path)
 
 
