@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.nio.file.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 public class ParkingAnnotator extends JPanel {
 
@@ -15,42 +17,129 @@ public class ParkingAnnotator extends JPanel {
     private ArrayList<Spot> spots = new ArrayList<>();
     private ArrayList<Point> currentPolygon = new ArrayList<>();
 
+    private Spot selectedSpot = null;
+
+    private JTextField rowField = new JTextField(3);
+    private JTextField colField = new JTextField(3);
+
+    private int autoColCounter = 1;
+
     public ParkingAnnotator(String path) {
 
         background = new ImageIcon(path).getImage();
 
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
+
+                
+        rowField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void reset() {
+                autoColCounter = 1;
+                colField.setText("1");
+            }
+
+            public void insertUpdate(DocumentEvent e) { reset(); }
+            public void removeUpdate(DocumentEvent e) { reset(); }
+            public void changedUpdate(DocumentEvent e) { reset(); }
+
+        });
+
         MouseAdapter mouse = new MouseAdapter() {
 
             public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
+                Point click = e.getPoint();
 
-                // RIGHT CLICK = finish polygon
-                if (SwingUtilities.isRightMouseButton(e)) {
+                for (Spot s : spots) {
+                    if (s.poly.contains(click)) {
+                        selectedSpot = s;
+                        repaint();
+                        return;
+                    }
+                }
 
-                    if (currentPolygon.size() >= 3) {
+                selectedSpot = null;
 
-                        String id = JOptionPane.showInputDialog("Spot ID:");
+                currentPolygon.add(click);
 
-                        if (id != null && !id.isEmpty()) {
+                if (currentPolygon.size() == 4) {
 
-                            Polygon poly = sortPolygon(currentPolygon);
+                    String row = rowField.getText().trim();
+                    String col = colField.getText().trim();
 
-                            spots.add(new Spot(id, poly, false));
-                        }
+                    if (col.isEmpty()) {
+                        col = String.valueOf(autoColCounter);
+                    }
+
+                    if (!row.isEmpty()) {
+
+                                            
+                    String id = row + col;
+
+                    if (spotIdExists(id)) {
+
+                        JOptionPane.showMessageDialog(
+                            ParkingAnnotator.this,
+                            "Spot ID already exists: " + id
+                        );
+
+                    } else {
+
+                        Polygon poly = sortPolygon(currentPolygon);
+
+                        spots.add(new Spot(id, poly, false));
+
+                        autoColCounter++;
+                        colField.setText(String.valueOf(autoColCounter));
+                    }
                     }
 
                     currentPolygon.clear();
-                    repaint();
-                    return;
                 }
-
-                // LEFT CLICK = add point
-                currentPolygon.add(e.getPoint());
 
                 repaint();
             }
         };
 
         addMouseListener(mouse);
+
+        addKeyListener(new KeyAdapter() {
+
+            public void keyPressed(KeyEvent e) {
+
+                if (e.getKeyCode() == KeyEvent.VK_DELETE && selectedSpot != null) {
+
+                    spots.remove(selectedSpot);
+                    selectedSpot = null;
+                    repaint();
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+
+                    currentPolygon.clear();
+                    repaint();
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_O && selectedSpot != null) {
+
+                    selectedSpot.occupied = !selectedSpot.occupied;
+                    repaint();
+                }
+            }
+        });
+    }
+
+    
+    private boolean spotIdExists(String id) {
+
+        for (Spot s : spots) {
+            if (s.id.equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Polygon sortPolygon(ArrayList<Point> pts) {
@@ -69,18 +158,18 @@ public class ParkingAnnotator extends JPanel {
         final double fcx = cx;
         final double fcy = cy;
 
-        pts.sort((a, b) -> {
+        pts.sort((a,b)->{
 
-            double angleA = Math.atan2(a.y - fcy, a.x - fcx);
-            double angleB = Math.atan2(b.y - fcy, b.x - fcx);
+            double angleA = Math.atan2(a.y-fcy,a.x-fcx);
+            double angleB = Math.atan2(b.y-fcy,b.x-fcx);
 
-            return Double.compare(angleA, angleB);
+            return Double.compare(angleA,angleB);
         });
 
         Polygon poly = new Polygon();
 
-        for (Point p : pts)
-            poly.addPoint(p.x, p.y);
+        for(Point p:pts)
+            poly.addPoint(p.x,p.y);
 
         return poly;
     }
@@ -90,29 +179,30 @@ public class ParkingAnnotator extends JPanel {
         try {
 
             Path p = resolveRepoFile(SPOTS_JSON_PATH);
+
             Files.createDirectories(p.getParent());
 
             FileWriter fw = new FileWriter(p.toFile());
 
             fw.write("{\n \"spots\": [\n");
 
-            for (int i = 0; i < spots.size(); i++) {
+            for (int i=0;i<spots.size();i++) {
 
                 Spot s = spots.get(i);
 
-                fw.write("  { \"id\":\"" + s.id + "\", \"polygon\":[");
+                fw.write("  { \"id\":\""+s.id+"\", \"polygon\":[");
 
-                for (int j = 0; j < s.poly.npoints; j++) {
+                for (int j=0;j<s.poly.npoints;j++) {
 
-                    fw.write("[" + s.poly.xpoints[j] + "," + s.poly.ypoints[j] + "]");
+                    fw.write("["+s.poly.xpoints[j]+","+s.poly.ypoints[j]+"]");
 
-                    if (j < s.poly.npoints - 1)
+                    if (j<s.poly.npoints-1)
                         fw.write(",");
                 }
 
-                fw.write("], \"occupied\": " + s.occupied + " }");
+                fw.write("], \"occupied\": "+s.occupied+" }");
 
-                if (i < spots.size() - 1)
+                if (i<spots.size()-1)
                     fw.write(",");
 
                 fw.write("\n");
@@ -122,9 +212,9 @@ public class ParkingAnnotator extends JPanel {
 
             fw.close();
 
-            JOptionPane.showMessageDialog(this, "Exported!");
+            JOptionPane.showMessageDialog(this,"Exported!");
 
-        } catch (Exception ex) {
+        } catch(Exception ex) {
 
             ex.printStackTrace();
         }
@@ -135,6 +225,9 @@ public class ParkingAnnotator extends JPanel {
         try {
 
             Path p = resolveRepoFile(SPOTS_JSON_PATH);
+
+            if (!Files.exists(p))
+                return;
 
             String txt = Files.readString(p);
 
@@ -151,13 +244,13 @@ public class ParkingAnnotator extends JPanel {
 
                 ArrayList<Point> pts = new ArrayList<>();
 
-                String poly = e.substring(e.indexOf("[[") + 2, e.indexOf("]]"));
+                String poly = e.substring(e.indexOf("[[")+2,e.indexOf("]]"));
 
                 String[] pairs = poly.split("\\],\\[");
 
-                for (String pair : pairs) {
+                for(String pair:pairs){
 
-                    String[] xy = pair.split(",");
+                    String[] xy=pair.split(",");
 
                     pts.add(new Point(
                             Integer.parseInt(xy[0]),
@@ -165,19 +258,42 @@ public class ParkingAnnotator extends JPanel {
                     ));
                 }
 
-                Polygon polygon = new Polygon();
+                Polygon polygon=new Polygon();
 
-                for (Point pt : pts)
-                    polygon.addPoint(pt.x, pt.y);
+                for(Point pt:pts)
+                    polygon.addPoint(pt.x,pt.y);
 
-                boolean occ = e.contains("\"occupied\": true");
+                boolean occ=e.contains("\"occupied\": true");
 
-                spots.add(new Spot(id, polygon, occ));
+                spots.add(new Spot(id,polygon,occ));
             }
+
+            
+            int maxCol = 0;
+
+            String row = rowField.getText().trim();
+
+            for (Spot s : spots) {
+
+                if (s.id.startsWith(row)) {
+
+                    try {
+
+                        int col = Integer.parseInt(s.id.substring(row.length()));
+
+                        if (col > maxCol)
+                            maxCol = col;
+
+                    } catch (Exception ignore) {}
+                }
+            }
+
+            autoColCounter = maxCol + 1;
+            colField.setText(String.valueOf(autoColCounter));
 
             repaint();
 
-        } catch (Exception ex) {
+        } catch(Exception ex) {
 
             ex.printStackTrace();
         }
@@ -187,32 +303,37 @@ public class ParkingAnnotator extends JPanel {
 
         super.paintComponent(g);
 
-        g.drawImage(background, 0, 0, this);
+        g.drawImage(background,0,0,this);
 
         for (Spot s : spots) {
 
-            g.setColor(s.occupied ? Color.RED : new Color(0, 200, 0));
+            if (s == selectedSpot)
+                g.setColor(Color.YELLOW);
+            else if (s.occupied)
+                g.setColor(Color.RED);
+            else
+                g.setColor(Color.GREEN);
 
             g.drawPolygon(s.poly);
 
             Rectangle r = s.poly.getBounds();
 
-            g.drawString(s.id, r.x + 5, r.y + 15);
+            g.drawString(s.id,r.x+5,r.y+15);
         }
 
-        g.setColor(Color.YELLOW);
+        g.setColor(Color.CYAN);
 
-        for (int i = 0; i < currentPolygon.size(); i++) {
+        for(int i=0;i<currentPolygon.size();i++){
 
-            Point p = currentPolygon.get(i);
+            Point p=currentPolygon.get(i);
 
-            g.fillOval(p.x - 3, p.y - 3, 6, 6);
+            g.fillOval(p.x-3,p.y-3,6,6);
 
-            if (i > 0) {
+            if(i>0){
 
-                Point prev = currentPolygon.get(i - 1);
+                Point prev=currentPolygon.get(i-1);
 
-                g.drawLine(prev.x, prev.y, p.x, p.y);
+                g.drawLine(prev.x,prev.y,p.x,p.y);
             }
         }
     }
@@ -229,14 +350,14 @@ public class ParkingAnnotator extends JPanel {
 
         Path cwd = Path.of(System.getProperty("user.dir")).toAbsolutePath();
 
-        Path p = cwd;
+        Path p=cwd;
 
-        while (p != null) {
+        while(p!=null){
 
-            if (Files.exists(p.resolve("backend")))
+            if(Files.exists(p.resolve("backend")))
                 return p.resolve(rel);
 
-            p = p.getParent();
+            p=p.getParent();
         }
 
         return cwd.resolve(rel);
@@ -244,25 +365,31 @@ public class ParkingAnnotator extends JPanel {
 
     public static void main(String[] args) {
 
-        JFrame frame = new JFrame("Parking Annotator");
+        JFrame frame=new JFrame("Parking Annotator");
 
-        ParkingAnnotator panel = new ParkingAnnotator(IMAGE_PATH);
+        ParkingAnnotator panel=new ParkingAnnotator(IMAGE_PATH);
 
-        JButton export = new JButton("Export JSON");
-        JButton importBtn = new JButton("Import JSON");
+        JButton export=new JButton("Export JSON");
+        JButton importBtn=new JButton("Import JSON");
 
-        export.addActionListener(e -> panel.exportToDataJson());
-        importBtn.addActionListener(e -> panel.importFromDataJson());
+        export.addActionListener(e->panel.exportToDataJson());
+        importBtn.addActionListener(e->panel.importFromDataJson());
 
-        JPanel controls = new JPanel();
+        JPanel controls=new JPanel();
+
+        controls.add(new JLabel("Row:"));
+        controls.add(panel.rowField);
+
+        controls.add(new JLabel("Col:"));
+        controls.add(panel.colField);
 
         controls.add(export);
         controls.add(importBtn);
 
         frame.setLayout(new BorderLayout());
 
-        frame.add(new JScrollPane(panel), BorderLayout.CENTER);
-        frame.add(controls, BorderLayout.SOUTH);
+        frame.add(new JScrollPane(panel),BorderLayout.CENTER);
+        frame.add(controls,BorderLayout.SOUTH);
 
         frame.pack();
 
@@ -278,10 +405,10 @@ class Spot {
     Polygon poly;
     boolean occupied;
 
-    Spot(String id, Polygon poly, boolean occ) {
+    Spot(String id,Polygon poly,boolean occ){
 
-        this.id = id;
-        this.poly = poly;
-        this.occupied = occ;
+        this.id=id;
+        this.poly=poly;
+        this.occupied=occ;
     }
 }
