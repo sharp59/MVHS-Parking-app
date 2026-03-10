@@ -1,6 +1,7 @@
 import json
 import cv2
 from pathlib import Path
+import numpy as np
 
 
 def repo_root():
@@ -33,9 +34,12 @@ def main():
         spots = json.load(f)["spots"]
 
     for s in spots:
+
         sid = s["id"]
 
-        pts = np.array(s["polygon"],np.int32)
+        pts = np.array(s["polygon"], np.int32)
+
+        x, y, w, h = cv2.boundingRect(pts)
 
         cv2.polylines(
             img,
@@ -51,10 +55,10 @@ def main():
             (x, max(y - 5, 15)),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
-            (0, 255, 0),
+            (0,255,0),
             1,
             cv2.LINE_AA,
-)
+        )
 
     cv2.imwrite(str(out_path), img)
     print("Wrote", out_path)
