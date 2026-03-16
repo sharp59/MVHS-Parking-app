@@ -4,15 +4,17 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-
+#model notes:
+# promising mAlexNet: (smaller models)
+#  model 4: 17/19 | all false pos, most likely can't rescale bc of confidences
+#  model 5: 19/19 | no incorrect, super certain on occupied, some unoccupied hovers ~20-40 confidence so we can rescale to tighten it up
+#  model 6: 12/19 | all false pos, all occupied confidence is >0.9990, highest unoccupised at 0.91, so rescale likely fixes
+# 
+# will probably choose between model 5 and 6
+# TODO: tighten up confidence on 5, try rescaling 6 and fix the errors
+# no promising AlexNet (bigger models)
 def find_first_model(repo_root: Path):
-    """
-    Looks for:
-      repo_root/backend/models/method4/**.prototxt
-      repo_root/backend/models/method4/**.caffemodel
-    Returns (prototxt_path, caffemodel_path)
-    """
-    base = repo_root / "backend" / "models" / "method4"
+    base = repo_root / "backend" / "models" / "method5"
     prototxts = list(base.rglob("*.prototxt"))
     caffes = list(base.rglob("*.caffemodel"))
 
@@ -21,19 +23,16 @@ def find_first_model(repo_root: Path):
             f"Could not find .prototxt/.caffemodel under {base}. Check your folder location."
         )
 
-    # Pick the first pair found (fine for now).
     return prototxts[0], caffes[0]
 
 
 def main():
-    repo_root = Path(__file__).resolve().parents[2]   # .../MVHS-Parking-app
-    backend_root = Path(__file__).resolve().parents[1]  # .../MVHS-Parking-app/backend
+    repo_root = Path(__file__).resolve().parents[2]
+    backend_root = Path(__file__).resolve().parents[1]
 
-    # ---- load model ----
     prototxt, model = find_first_model(repo_root)
     net = cv2.dnn.readNetFromCaffe(str(prototxt), str(model))
 
-    # ---- load data ----
     img_path = backend_root / "data" / "frame.jpg"
     spots_path = backend_root / "data" / "spots.json"
 
@@ -44,7 +43,6 @@ def main():
     with open(spots_path, "r") as f:
         spots = json.load(f)["spots"]
 
-    # ---- inference settings (the ones that worked for you) ----
     INPUT_W, INPUT_H = 224, 224
     SCALE = 1 / 255.0
     MEAN = (0, 0, 0)
@@ -53,19 +51,26 @@ def main():
     np.set_printoptions(precision=8, suppress=False)
 
     results = []
+    debug_boxes = []
+    output_lines = []
+
     correct = 0
     total = 0
+
+    false_pos = 0
+    false_neg = 0
+
+    false_pos_list = []
+    false_neg_list = []
 
     for s in spots:
         sid = s["id"]
         x, y, w, h = s["rect"]
 
-        # "real value" from spots.json (defaults to False if missing)
         real_occupied = bool(s.get("occupied", False))
 
-        patch = img[y : y + h, x : x + w]
+        patch = img[y:y+h, x:x+w]
         if patch.size == 0:
-            print(f"{sid}: [?, ?], ?, real={real_occupied}, correct?=False  (EMPTY PATCH out of bounds)")
             continue
 
         blob = cv2.dnn.blobFromImage(
@@ -80,26 +85,46 @@ def main():
         net.setInput(blob)
         out = net.forward().flatten()
 
-        if out.size != 2:
-            raise RuntimeError(f"Expected 2 outputs, got shape {out.shape} for {sid}: {out}")
-
-        p_unocc = float(out[0])  # unoccupied/empty confidence
-        p_occ = float(out[1])    # occupied confidence
+        p_unocc = float(out[0])
+        p_occ = float(out[1])
 
         pred_occupied = p_occ > 0.5
-        is_correct = (pred_occupied == real_occupied)
+        is_correct = pred_occupied == real_occupied
+
+        debug_boxes.append({
+            "rect": (x, y, w, h),
+            "correct": is_correct,
+            "id": sid
+        })
 
         total += 1
+
         if is_correct:
             correct += 1
+        else:
+            if pred_occupied and not real_occupied:
+                false_pos += 1
+                false_pos_list.append(sid)
+
+            elif not pred_occupied and real_occupied:
+                false_neg += 1
+                false_neg_list.append(sid)
 
         pred_text = "occupied" if pred_occupied else "unoccupied"
         real_text = "occupied" if real_occupied else "unoccupied"
 
-        print(
-            f"{sid}: [{p_unocc:.6f}, {p_occ:.6f}], "
-            f"pred={pred_text}, real={real_text}, correct?={is_correct}"
+        line = (
+            f"{sid}:\t[{p_unocc:.6f},{p_occ:.6f}], "
+            f"pred={pred_text},\treal={real_text}, \tcorrect?={is_correct}"
         )
+
+        print(line)
+
+        output_lines.append({
+            "sid": sid,
+            "real": real_occupied,
+            "line": line
+        })
 
         results.append(
             {
@@ -112,13 +137,81 @@ def main():
             }
         )
 
-    # Summary line
+    incorrect = total - correct
+
+    print("\n==============================")
+    print("RESULTS SORTED BY SPOT ID")
+    print("==============================")
+
+    for e in sorted(output_lines, key=lambda x: x["sid"]):
+        print(e["line"])
+
+    print("\n==============================")
+    print("RESULTS GROUPED BY REAL VALUE")
+    print("==============================")
+
+    print("\n--- REAL: OCCUPIED ---")
+    for e in output_lines:
+        if e["real"]:
+            print(e["line"])
+
+    print("\n--- REAL: UNOCCUPIED ---")
+    for e in output_lines:
+        if not e["real"]:
+            print(e["line"])
+
     print(f"\n{correct}/{total}")
 
-    # Optional: write results for later use
+    if incorrect > 0:
+        print(f"{false_pos}/{incorrect} (thought occupied) -> {false_pos_list}")
+        print(f"{false_neg}/{incorrect} (thought unoccupied) -> {false_neg_list}")
+    else:
+        print("0/0 (no incorrect predictions)")
+
+    debug_img = img.copy()
+
+    for b in debug_boxes:
+        x, y, w, h = b["rect"]
+        sid = b["id"]
+
+        color = (0, 255, 0) if b["correct"] else (0, 0, 255)
+
+        cv2.rectangle(debug_img, (x, y), (x + w, y + h), color, 2)
+
+        cv2.putText(
+            debug_img,
+            sid,
+            (x, max(y - 5, 15)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            color,
+            1,
+            cv2.LINE_AA,
+        )
+
+    debug_path = backend_root / "data" / "debug_boxes.jpg"
+    cv2.imwrite(str(debug_path), debug_img)
+
+    print("Wrote debug image:", debug_path)
+
     out_path = backend_root / "data" / "predictions.json"
+
     with open(out_path, "w") as f:
-        json.dump({"spots": results, "correct": correct, "total": total}, f, indent=2)
+        json.dump(
+            {
+                "spots": results,
+                "correct": correct,
+                "total": total,
+                "incorrect": incorrect,
+                "false_positive": false_pos,
+                "false_negative": false_neg,
+                "false_positive_spots": false_pos_list,
+                "false_negative_spots": false_neg_list,
+            },
+            f,
+            indent=2,
+        )
+
     print("Wrote:", out_path)
 
 
