@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.io.FileWriter;
 import java.nio.file.*;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -264,7 +265,8 @@ public class ParkingAnnotator extends JPanel {
                 if (!e.contains("polygon"))
                     continue;
 
-                String id = e.replaceAll(".*\"id\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+                Matcher idMatcher = Pattern.compile("\"id\"\\s*:\\s*\"([^\"]+)\"").matcher(e);
+                String id = idMatcher.find() ? idMatcher.group(1) : "<unknown>";
 
                 ArrayList<Point> pts = new ArrayList<>();
 

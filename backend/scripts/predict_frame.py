@@ -12,7 +12,7 @@ import numpy as np
 # method6: 12/19 | high occupied confidences
 
 
-def find_first_model(repo_root: Path, method_name: str = "method5"):
+def find_first_model(repo_root: Path, method_name: str = "method4"):
     base = repo_root / "backend" / "models" / method_name
 
     prototxts = list(base.rglob("*.prototxt"))
@@ -28,7 +28,7 @@ def find_first_model(repo_root: Path, method_name: str = "method5"):
 
 def main():
     parser = argparse.ArgumentParser(description="Predict parking spots from frame.jpg")
-    parser.add_argument("--model-method", default="method5", help="model folder under backend/models (method4/method5/method6)")
+    parser.add_argument("--model-method", default="method6", help="model folder under backend/models (method4/method5/method6)")
     parser.add_argument("--threshold", type=float, default=0.5, help="confidence threshold for occupied decision")
     args = parser.parse_args()
 
@@ -76,7 +76,7 @@ def main():
     img_h, img_w = img.shape[:2]
 
     for s in spots:
-        sid = s.get("id", "<unknown>")
+        sid = s.get("id", "<unknown>").strip()
         real_occupied = bool(s.get("occupied", False))
         poly = s.get("polygon")
         if not poly:
@@ -193,8 +193,8 @@ def main():
     print(f"\n{correct}/{total}")
 
     if incorrect > 0:
-        print(f"{false_pos}/{incorrect} (thought occupied) -> {false_pos_list}")
-        print(f"{false_neg}/{incorrect} (thought unoccupied) -> {false_neg_list}")
+        print(f"{false_pos}/{incorrect} (thought occupied) -> {', '.join(s.strip() for s in false_pos_list)}")
+        print(f"{false_neg}/{incorrect} (thought unoccupied) -> {', '.join(s.strip() for s in false_neg_list)}")
     else:
         print("0/0 (no incorrect predictions)")
 
