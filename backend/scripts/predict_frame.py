@@ -10,9 +10,11 @@ import numpy as np
 # method4: 17/19 | all false pos
 # method5: 19/19 | best on validation
 # method6: 12/19 | high occupied confidences
+DEFAULT_MODEL = "method6"
+DEFAULT_SCALE = 7000
 
 
-def find_first_model(repo_root: Path, method_name: str = "method4"):
+def find_first_model(repo_root: Path, method_name: str = DEFAULT_MODEL):
     base = repo_root / "backend" / "models" / method_name
 
     prototxts = list(base.rglob("*.prototxt"))
@@ -28,8 +30,9 @@ def find_first_model(repo_root: Path, method_name: str = "method4"):
 
 def main():
     parser = argparse.ArgumentParser(description="Predict parking spots from frame.jpg")
-    parser.add_argument("--model-method", default="method6", help="model folder under backend/models (method4/method5/method6)")
+    parser.add_argument("--model-method", default=DEFAULT_MODEL, help="model folder under backend/models (method4/method5/method6)")
     parser.add_argument("--threshold", type=float, default=0.5, help="confidence threshold for occupied decision")
+    parser.add_argument("--scale", type=float, default=DEFAULT_SCALE, help="multiplier applied to p_unocc before decision; >1 makes it harder to predict occupied")
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[2]
@@ -51,7 +54,7 @@ def main():
         spots = json.load(f).get("spots", [])
 
     INPUT_W, INPUT_H = 224, 224
-    SCALE = 1 / 255.0
+    SCALE = 1 / 255
     MEAN = (0, 0, 0)
     SWAP_RB = False
 
@@ -113,7 +116,7 @@ def main():
 
         patch = cv2.resize(patch, (INPUT_W, INPUT_H))
         patches.append(patch)
-        meta.append({"sid": sid, "real": real_occupied, "rect": (x, y, w, h)})
+        meta.append({"sid": sid, "real": real_occupied, "rect": (x, y, w, h), "pts": pts})
 
     if len(patches) == 0:
         print("No valid patches to predict.")
@@ -144,10 +147,11 @@ def main():
             # handle case where model outputs channel order [unocc, occ]
             p_unocc = float(out[0])
             p_occ = float(out[1])
-            pred_occupied = p_occ > args.threshold
+            p_occ_adj = p_occ / (p_occ + p_unocc * args.scale)
+            pred_occupied = p_occ_adj > args.threshold
             is_correct = pred_occupied == meta[i]["real"]
 
-            debug_boxes.append({"rect": (x, y, w, h), "correct": is_correct, "id": sid})
+            debug_boxes.append({"rect": (x, y, w, h), "pts": meta[i]["pts"], "correct": is_correct, "id": sid})
 
             total += 1
             if is_correct:
@@ -190,7 +194,7 @@ def main():
         if not e["real"]:
             print(e["line"])
 
-    print(f"\n{correct}/{total}")
+    print(f"\n{correct}/{total} correct")
 
     if incorrect > 0:
         print(f"{false_pos}/{incorrect} (thought occupied) -> {', '.join(s.strip() for s in false_pos_list)}")
@@ -206,7 +210,7 @@ def main():
 
         color = (0, 255, 0) if b["correct"] else (0, 0, 255)
 
-        cv2.rectangle(debug_img, (x, y), (x + w, y + h), color, 2)
+        cv2.polylines(debug_img, [b["pts"]], True, color, 2)
 
         cv2.putText(
             debug_img,
@@ -219,7 +223,7 @@ def main():
             cv2.LINE_AA,
         )
 
-    debug_path = backend_root / "data" / "debug_boxes.jpg"
+    debug_path = backend_root / "data" / "predicted_boxes.jpg"
     cv2.imwrite(str(debug_path), debug_img)
 
     print("Wrote debug image:", debug_path)

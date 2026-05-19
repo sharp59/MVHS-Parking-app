@@ -35,7 +35,9 @@ def main():
 
     for s in spots:
 
-        sid = s["id"]
+        sid = s["id"].strip()
+        occupied = s.get("occupied", False)
+        color = (0, 0, 255) if occupied else (0, 255, 0)
 
         pts = np.array(s["polygon"], np.int32)
 
@@ -45,7 +47,7 @@ def main():
             img,
             [pts],
             True,
-            (0,255,0),
+            color,
             2
         )
 
@@ -55,7 +57,7 @@ def main():
             (x, max(y - 5, 15)),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
-            (0,255,0),
+            color,
             1,
             cv2.LINE_AA,
         )

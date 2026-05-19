@@ -2,11 +2,11 @@
   "spots": [
     {
       "id": "A1",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.9929096102714539,
       "confidence_unoccupied": 0.00709038320928812,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A3",
@@ -26,11 +26,11 @@
     },
     {
       "id": "A6",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.9868144989013672,
       "confidence_unoccupied": 0.01318556908518076,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A7",
@@ -42,11 +42,11 @@
     },
     {
       "id": "A8",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.9994649291038513,
       "confidence_unoccupied": 0.000535059196408838,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A9",
@@ -58,19 +58,19 @@
     },
     {
       "id": "A10",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.9997808337211609,
       "confidence_unoccupied": 0.0002191708335885778,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A11",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.999798595905304,
       "confidence_unoccupied": 0.00020147563191130757,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A5",
@@ -82,11 +82,11 @@
     },
     {
       "id": "A12",
-      "predicted_occupied": true,
+      "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.9992557168006897,
       "confidence_unoccupied": 0.0007442700443789363,
-      "correct": false
+      "correct": true
     },
     {
       "id": "A13",
@@ -97,18 +97,11 @@
       "correct": true
     }
   ],
-  "correct": 6,
+  "correct": 12,
   "total": 12,
-  "incorrect": 6,
-  "false_positive": 6,
+  "incorrect": 0,
+  "false_positive": 0,
   "false_negative": 0,
-  "false_positive_spots": [
-    "A1",
-    "A6",
-    "A8",
-    "A10",
-    "A11",
-    "A12"
-  ],
+  "false_positive_spots": [],
   "false_negative_spots": []
 }
