@@ -105,35 +105,43 @@ def main():
 
     for s in spots:
 
-        sid = s["id"]
+        sid = s.get("id", "<unknown>")
 
         real_occupied = bool(s.get("occupied", False))
 
-        patch = img[y:y+h, x:x+w]
+        # Validate polygon
+        poly = s.get("polygon")
+        if not poly:
+            print(f"{sid}: missing/empty polygon, skipping")
+            continue
 
-        pts = np.array(s["polygon"], np.int32)
+        try:
+            pts = np.array(poly, np.int32)
+        except Exception as exc:
+            print(f"{sid}: invalid polygon data: {exc}")
+            continue
 
+        # Compute bounding rectangle BEFORE any use of x,y,w,h
         x, y, w, h = cv2.boundingRect(pts)
 
-        # ------------------------------------------------------
-        # NORMAL CROPPING (CURRENT BEHAVIOR)
-        # ------------------------------------------------------
+        # Skip degenerate boxes
+        if w <= 0 or h <= 0:
+            print(f"{sid}: degenerate bounding box (w={w}, h={h}), skipping")
+            continue
 
+        # Clamp to image bounds
+        img_h, img_w = img.shape[:2]
+        x = max(0, min(x, img_w - 1))
+        y = max(0, min(y, img_h - 1))
+        w = max(0, min(w, img_w - x))
+        h = max(0, min(h, img_h - y))
+
+        # Crop and mask
         crop = img[y:y+h, x:x+w].copy()
 
-        # ------------------------------------------------------
-        # BACKGROUND SUBTRACTION VERSION (ENABLE LATER)
-        #
-        # crop = diff[y:y+h, x:x+w].copy()
-        #
-        # ------------------------------------------------------
-
         mask = np.zeros((h, w), dtype=np.uint8)
-
         pts_shifted = pts - [x, y]
-
         cv2.fillPoly(mask, [pts_shifted], 255)
-
         patch = cv2.bitwise_and(crop, crop, mask=mask)
 
         if patch.size == 0:
@@ -171,8 +179,7 @@ def main():
             "id": sid
         })
 
-        real_occupied = bool(s.get("occupied", False))
-
+        # keep real_occupied from the data (already set above)
         is_correct = (pred_occupied == real_occupied)
 
         total += 1
@@ -183,7 +190,6 @@ def main():
             if pred_occupied and not real_occupied:
                 false_pos += 1
                 false_pos_list.append(sid)
-
             elif not pred_occupied and real_occupied:
                 false_neg += 1
                 false_neg_list.append(sid)

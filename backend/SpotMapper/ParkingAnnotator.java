@@ -49,7 +49,7 @@ public class ParkingAnnotator extends JPanel {
 
             public void mousePressed(MouseEvent e) {
                 requestFocusInWindow();
-                Point click = e.getPoint();
+                Point click = new Point(e.getX(), e.getY());
 
                 for (Spot s : spots) {
                     if (s.poly.contains(click)) {
@@ -174,6 +174,29 @@ public class ParkingAnnotator extends JPanel {
         return poly;
     }
 
+    private static String escapeJsonString(String s) {
+        if (s == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            switch (c) {
+                case '"':  sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\b': sb.append("\\b");  break;
+                case '\f': sb.append("\\f");  break;
+                case '\n': sb.append("\\n");  break;
+                case '\r': sb.append("\\r");  break;
+                case '\t': sb.append("\\t");  break;
+                default:
+                    if (c < 32) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
+    }
+    
     public void exportToDataJson() {
 
         try {
@@ -190,7 +213,7 @@ public class ParkingAnnotator extends JPanel {
 
                 Spot s = spots.get(i);
 
-                fw.write("  { \"id\":\""+s.id+"\", \"polygon\":[");
+                fw.write("  { \"id\":\""+escapeJsonString(s.id)+"\", \"polygon\":[");
 
                 for (int j=0;j<s.poly.npoints;j++) {
 
