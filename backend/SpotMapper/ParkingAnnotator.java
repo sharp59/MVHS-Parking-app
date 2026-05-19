@@ -4,8 +4,8 @@ import java.io.FileWriter;
 import java.nio.file.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class ParkingAnnotator extends JPanel {
 
@@ -108,7 +108,7 @@ public class ParkingAnnotator extends JPanel {
 
             public void keyPressed(KeyEvent e) {
 
-                if (e.getKeyCode() == KeyEvent.VK_DELETE && selectedSpot != null) {
+                if (e.getKeyCode() == KeyEvent.VK_D && selectedSpot != null) {
 
                     spots.remove(selectedSpot);
                     selectedSpot = null;

@@ -1,22 +1,38 @@
 {
-  "spots": [
-    { "id": "A1", "rect": [21, 721, 130, 45], "occupied": false },
-    { "id": "A2", "rect": [164, 717, 127, 47], "occupied": true },
-    { "id": "A3", "rect": [300, 715, 131, 46], "occupied": true },
-    { "id": "A4", "rect": [441, 709, 130, 45], "occupied": true },
-    { "id": "A5", "rect": [575, 703, 136, 45], "occupied": false },
-    { "id": "A6", "rect": [712, 692, 128, 51], "occupied": true },
-    { "id": "A7", "rect": [837, 689, 141, 46], "occupied": false },
-    { "id": "A8", "rect": [982, 683, 144, 51], "occupied": true },
-    { "id": "A9", "rect": [1117, 677, 129, 43], "occupied": false },
-    { "id": "A10", "rect": [1240, 671, 153, 39], "occupied": false },
-    { "id": "B1", "rect": [35, 908, 186, 73], "occupied": true },
-    { "id": "B2", "rect": [234, 904, 201, 83], "occupied": true },
-    { "id": "B3", "rect": [438, 897, 201, 80], "occupied": true },
-    { "id": "B4", "rect": [641, 893, 211, 83], "occupied": true },
-    { "id": "B5", "rect": [851, 881, 201, 93], "occupied": false },
-    { "id": "B6", "rect": [1055, 869, 183, 99], "occupied": false },
-    { "id": "B7", "rect": [1233, 859, 237, 91], "occupied": true },
-    { "id": "B8", "rect": [1467, 844, 182, 106], "occupied": true }
+ "spots": [
+  { "id":"A1
+    
+  ", "polygon":[[37,721],[166,718],[142,761],[2,762]], "occupied": true },
+  { "id":"A3
+    
+  ", "polygon":[[174,717],[306,713],[291,756],[149,757]], "occupied": false },
+  { "id":"A4
+    
+  ", "polygon":[[306,714],[434,709],[434,752],[295,754]], "occupied": false },
+  { "id":"A6
+    
+  ", "polygon":[[572,703],[695,698],[717,737],[581,740]], "occupied": true },
+  { "id":"A7
+    
+  ", "polygon":[[704,696],[822,690],[866,732],[718,737]], "occupied": false },
+  { "id":"A8
+    
+  ", "polygon":[[830,691],[956,688],[1001,722],[873,730]], "occupied": true },
+  { "id":"A9
+    
+  ", "polygon":[[962,690],[1078,682],[1136,718],[1004,723]], "occupied": false },
+  { "id":"A10
+    
+  ", "polygon":[[1090,684],[1201,677],[1268,707],[1141,719]], "occupied": true },
+  { "id":"A11
+    
+  ", "polygon":[[1209,675],[1327,671],[1389,697],[1273,708]], "occupied": true },
+  { "id":"A12
   ]
+}
+  ", "polygon":[[1330,671],[1447,666],[1516,697],[1390,697]], "occupied": true },
+  { "id":"a5
+ ]
+}", "polygon":[[440,712],[564,709],[577,747],[442,754]], "occupied": false }
+ ]
 }
