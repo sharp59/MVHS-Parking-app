@@ -13,7 +13,7 @@
       "predicted_occupied": true,
       "real_occupied": true,
       "confidence_occupied": 0.9999995231628418,
-      "confidence_unoccupied": 4.697458564351109e-07,
+      "confidence_unoccupied": 4.697463111824618e-07,
       "correct": true
     },
     {
@@ -69,7 +69,7 @@
       "predicted_occupied": false,
       "real_occupied": false,
       "confidence_occupied": 0.999798595905304,
-      "confidence_unoccupied": 0.00020147563191130757,
+      "confidence_unoccupied": 0.00020147582108620554,
       "correct": true
     },
     {
@@ -95,10 +95,18 @@
       "confidence_occupied": 0.9999943971633911,
       "confidence_unoccupied": 5.634430635836907e-06,
       "correct": true
+    },
+    {
+      "id": "B1",
+      "predicted_occupied": false,
+      "real_occupied": false,
+      "confidence_occupied": 0.9940808415412903,
+      "confidence_unoccupied": 0.005919098854064941,
+      "correct": true
     }
   ],
-  "correct": 12,
-  "total": 12,
+  "correct": 13,
+  "total": 13,
   "incorrect": 0,
   "false_positive": 0,
   "false_negative": 0,
