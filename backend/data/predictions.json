@@ -1,119 +1,114 @@
 {
   "spots": [
     {
-      "id": "A1\r\n  \n  ",
-      "predicted_occupied": false,
-      "real_occupied": true,
-      "confidence_occupied": 0.4548287093639374,
-      "confidence_unoccupied": 0.545171320438385,
-      "correct": false
-    },
-    {
-      "id": "A3\r\n  \n  ",
-      "predicted_occupied": true,
-      "real_occupied": false,
-      "confidence_occupied": 0.9997929930686951,
-      "confidence_unoccupied": 0.0002070124028250575,
-      "correct": false
-    },
-    {
-      "id": "A4\r\n  \n  ",
-      "predicted_occupied": true,
-      "real_occupied": false,
-      "confidence_occupied": 0.9989380240440369,
-      "confidence_unoccupied": 0.001062001334503293,
-      "correct": false
-    },
-    {
-      "id": "A6\r\n  \n  ",
-      "predicted_occupied": false,
-      "real_occupied": true,
-      "confidence_occupied": 0.23575708270072937,
-      "confidence_unoccupied": 0.764242947101593,
-      "correct": false
-    },
-    {
-      "id": "A7\r\n  \n  ",
-      "predicted_occupied": true,
-      "real_occupied": false,
-      "confidence_occupied": 0.9957091808319092,
-      "confidence_unoccupied": 0.00429084338247776,
-      "correct": false
-    },
-    {
-      "id": "A8\r\n  \n  ",
-      "predicted_occupied": false,
-      "real_occupied": true,
-      "confidence_occupied": 0.4813743531703949,
-      "confidence_unoccupied": 0.5186257362365723,
-      "correct": false
-    },
-    {
-      "id": "A9\r\n  \n  ",
-      "predicted_occupied": true,
-      "real_occupied": false,
-      "confidence_occupied": 0.9680046439170837,
-      "confidence_unoccupied": 0.03199537470936775,
-      "correct": false
-    },
-    {
-      "id": "A10\r\n  \n  ",
+      "id": "A1",
       "predicted_occupied": true,
       "real_occupied": true,
-      "confidence_occupied": 0.9243426322937012,
-      "confidence_unoccupied": 0.075657419860363,
+      "confidence_occupied": 0.9526209831237793,
+      "confidence_unoccupied": 0.04737899824976921,
       "correct": true
     },
     {
-      "id": "A11\r\n  \n  ",
+      "id": "A3",
+      "predicted_occupied": true,
+      "real_occupied": false,
+      "confidence_occupied": 0.9999994039535522,
+      "confidence_unoccupied": 6.205802947079064e-07,
+      "correct": false
+    },
+    {
+      "id": "A4",
+      "predicted_occupied": true,
+      "real_occupied": false,
+      "confidence_occupied": 0.9999891519546509,
+      "confidence_unoccupied": 1.0820293937285896e-05,
+      "correct": false
+    },
+    {
+      "id": "A6",
       "predicted_occupied": true,
       "real_occupied": true,
-      "confidence_occupied": 0.8984333872795105,
-      "confidence_unoccupied": 0.10156664997339249,
+      "confidence_occupied": 0.8341330289840698,
+      "confidence_unoccupied": 0.16586697101593018,
+      "correct": true
+    },
+    {
+      "id": "A7",
+      "predicted_occupied": true,
+      "real_occupied": false,
+      "confidence_occupied": 0.9996119141578674,
+      "confidence_unoccupied": 0.00038815828156657517,
+      "correct": false
+    },
+    {
+      "id": "A8",
+      "predicted_occupied": true,
+      "real_occupied": true,
+      "confidence_occupied": 0.9972209930419922,
+      "confidence_unoccupied": 0.00277905841358006,
+      "correct": true
+    },
+    {
+      "id": "A9",
+      "predicted_occupied": true,
+      "real_occupied": false,
+      "confidence_occupied": 0.999782145023346,
+      "confidence_unoccupied": 0.00021785161516163498,
+      "correct": false
+    },
+    {
+      "id": "A10",
+      "predicted_occupied": true,
+      "real_occupied": true,
+      "confidence_occupied": 0.9991520643234253,
+      "confidence_unoccupied": 0.0008479615789838135,
+      "correct": true
+    },
+    {
+      "id": "A11",
+      "predicted_occupied": true,
+      "real_occupied": true,
+      "confidence_occupied": 0.9992369413375854,
+      "confidence_unoccupied": 0.0007630865438841283,
       "correct": true
     },
     {
       "id": "A5",
       "predicted_occupied": true,
       "real_occupied": false,
-      "confidence_occupied": 0.9997147917747498,
-      "confidence_unoccupied": 0.00028522219508886337,
+      "confidence_occupied": 0.9999980926513672,
+      "confidence_unoccupied": 1.9130732198391343e-06,
       "correct": false
     },
     {
       "id": "A12",
-      "predicted_occupied": false,
+      "predicted_occupied": true,
       "real_occupied": true,
-      "confidence_occupied": 0.41579926013946533,
-      "confidence_unoccupied": 0.5842007398605347,
-      "correct": false
+      "confidence_occupied": 0.9971080422401428,
+      "confidence_unoccupied": 0.0028919850010424852,
+      "correct": true
     },
     {
       "id": "A13",
       "predicted_occupied": true,
       "real_occupied": false,
-      "confidence_occupied": 0.9977191090583801,
-      "confidence_unoccupied": 0.002280909800902009,
+      "confidence_occupied": 0.9999748468399048,
+      "confidence_unoccupied": 2.5122955776168965e-05,
       "correct": false
     }
   ],
-  "correct": 2,
+  "correct": 6,
   "total": 12,
-  "incorrect": 10,
+  "incorrect": 6,
   "false_positive": 6,
-  "false_negative": 4,
+  "false_negative": 0,
   "false_positive_spots": [
-    "A3\r\n  \n  ",
-    "A4\r\n  \n  ",
-    "A7\r\n  \n  ",
-    "A9\r\n  \n  ",
+    "A3",
+    "A4",
+    "A7",
+    "A9",
     "A5",
     "A13"
   ],
-  "false_negative_spots": [
-    "A1\r\n  \n  ",
-    "A6\r\n  \n  ",
-    "A8\r\n  \n  ",
-    "A12"
-  ]
+  "false_negative_spots": []
 }
